@@ -1,0 +1,159 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Store Sales Report · embedding demo</title>
+
+    <!-- The only line the widget needs: -->
+    <script type="module" src="./store-sales-report.js"></script>
+
+    <style>
+      /* Host page styles. Several are deliberately aggressive: none of them reach the widgets. */
+      body {
+        margin: 0;
+        background: #ecebe6;
+        color: #2b2a26;
+        font: 17px/1.6 Georgia, 'Times New Roman', serif;
+      }
+      button,
+      select {
+        border: 2px solid #b4461f;
+        background: #f7d9c4;
+        font-family: 'Courier New', monospace;
+        text-transform: uppercase;
+      }
+      table,
+      td,
+      th {
+        border: 2px dashed #b4461f;
+      }
+      h2 {
+        color: #b4461f;
+        letter-spacing: 0.1em;
+      }
+
+      .page {
+        display: grid;
+        gap: 24px;
+        max-width: 1440px;
+        margin: 0 auto;
+        padding: 24px;
+      }
+      .page > * {
+        margin: 0;
+      }
+      .controls {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 16px;
+        align-items: center;
+      }
+      .pair {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(min(100%, 560px), 1fr));
+        align-items: start;
+        gap: 24px;
+      }
+      .log {
+        height: 180px;
+        margin: 0;
+        overflow: auto;
+        padding: 12px;
+        background: #fff;
+        font-size: 12px;
+        line-height: 1.5;
+      }
+      code {
+        font-size: 14px;
+      }
+    </style>
+  </head>
+  <body>
+    <main class="page">
+      <header>
+        <h1>Store Sales Report: embedding demo</h1>
+        <p>
+          A plain HTML page with no framework. It loads <code>store-sales-report.js</code> and uses
+          <code>&lt;store-sales-report&gt;</code> three times. This page styles <code>button</code>,
+          <code>select</code>, <code>table</code> and <code>h2</code> on purpose to show that host
+          styles stay out of the widgets.
+        </p>
+      </header>
+
+      <section>
+        <h2>Full width</h2>
+        <div class="controls">
+          <label>
+            locale
+            <select data-attribute="locale">
+              <option>en</option>
+              <option>es</option>
+              <option>fr</option>
+            </select>
+          </label>
+          <label>
+            theme
+            <select data-attribute="theme">
+              <option>light</option>
+              <option>dark</option>
+            </select>
+          </label>
+          <span>These controls set attributes on the widget below.</span>
+        </div>
+      </section>
+
+      <store-sales-report id="main-widget" store-id="S-1042" locale="en" theme="light">
+      </store-sales-report>
+
+      <section>
+        <h2>Events</h2>
+        <p>
+          Listened for on <code>document</code>: the events bubble out of the widgets.
+        </p>
+        <pre class="log" id="log">Waiting for events…</pre>
+      </section>
+
+      <section>
+        <h2>Side by side</h2>
+        <p>
+          The layout follows the widget's own width, not the window's. Each widget has its own
+          store, language and theme. The right one gets a 14-day range through its
+          <code>from</code> and <code>to</code> attributes.
+        </p>
+      </section>
+
+      <div class="pair">
+        <store-sales-report store-id="S-2087" locale="fr" theme="dark"></store-sales-report>
+        <store-sales-report id="two-weeks-widget" store-id="S-1042" locale="es">
+        </store-sales-report>
+      </div>
+    </main>
+
+    <script type="module">
+      // Mock data always covers the 30 days before today, so compute the dates instead of hardcoding.
+      const isoDay = (daysAgo) => new Date(Date.now() - daysAgo * 864e5).toISOString().slice(0, 10)
+      const twoWeeks = document.getElementById('two-weeks-widget')
+      twoWeeks.setAttribute('from', isoDay(14))
+      twoWeeks.setAttribute('to', isoDay(1))
+
+      const widget = document.getElementById('main-widget')
+      for (const select of document.querySelectorAll('[data-attribute]')) {
+        select.addEventListener('change', () =>
+          widget.setAttribute(select.dataset.attribute, select.value),
+        )
+      }
+
+      const log = document.getElementById('log')
+      const lines = []
+      for (const type of ['loaded', 'load-error', 'filters-change']) {
+        document.addEventListener(type, (event) => {
+          const time = new Date().toLocaleTimeString()
+          const store = event.target.getAttribute('store-id')
+          lines.unshift(`${time}  ${store}  ${type}  ${JSON.stringify(event.detail)}`)
+          log.textContent = lines.slice(0, 50).join('\n')
+        })
+      }
+    </script>
+  </body>
+</html>
