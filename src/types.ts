@@ -12,6 +12,9 @@ export const PAYMENT_METHODS = ['cash', 'card', 'ebt', 'mobile'] as const
 export type PaymentMethod = (typeof PAYMENT_METHODS)[number]
 export type PaymentFilter = PaymentMethod | 'all'
 
+export const LOCALES = ['en', 'es', 'fr'] as const
+export type Locale = (typeof LOCALES)[number]
+
 export interface Transaction {
   id: string
   /** ISO 8601, UTC */
