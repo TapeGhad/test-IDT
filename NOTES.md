@@ -2,11 +2,12 @@
 
 ## Time spent
 
-_To fill in._
+4 hours
 
 ## How I used AI tools
 
-_To fill in._
+Build with Claude Code, I owned the scope, the architecture decisions and the definition of done; it wrote the code, tests
+and docs. Nothing counted as done on its own. Reviewed code, UI, requested updates, commit only after my approve & review
 
 ## Decisions where the brief left room
 
@@ -49,7 +50,7 @@ _To fill in._
   time, so there is one source of truth for both themes. It registers its controllers in Chart.js'
   shared registry. That is harmless if the host also uses Chart.js.
 - **Native date inputs** keep the bundle small and accessible, but they display dates in the
-  *browser's* locale, not the widget's. A localized date-range picker is a next step.
+  _browser's_ locale, not the widget's. A localized date-range picker is a next step.
 - **The standalone bundle includes Vue and Chart.js** (about 88 kB gzip), so a plain HTML page
   needs nothing else. One copy serves any number of widgets on the page. Vue apps should use the
   library build, which shares the app's Vue.
