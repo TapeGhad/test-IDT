@@ -2,7 +2,7 @@
 import { computed, ref, toRef, useHost, watch } from 'vue'
 import { LOCALE_NAMES, normalizeLocale, provideI18n } from '@/i18n'
 import { useSalesReport } from '@/composables/useSalesReport'
-import { computeKpis, dailyRevenue, filterByPayment } from '@/report/aggregate'
+import { computeKpis, dailyRevenue, filterByPayment, revenueByCategory } from '@/report/aggregate'
 import { defaultRange, isValidRange } from '@/report/dates'
 import {
   LOCALES,
@@ -12,6 +12,7 @@ import {
   type StoreSalesReportEventMap,
   type Theme,
 } from '@/types'
+import CategoryTable from './CategoryTable.ce.vue'
 import DailyRevenueChart from './DailyRevenueChart.ce.vue'
 import FiltersBar from './FiltersBar.ce.vue'
 import KpiCards from './KpiCards.ce.vue'
@@ -77,6 +78,7 @@ const kpis = computed(() => computeKpis(transactions.value))
 const daily = computed(() =>
   result.value ? dailyRevenue(transactions.value, result.value.range) : [],
 )
+const categories = computed(() => revenueByCategory(transactions.value))
 
 function onRangeChange(next: DateRange) {
   range.value = next
@@ -137,6 +139,7 @@ function onPaymentMethodChange(next: PaymentFilter) {
       <p v-if="transactions.length === 0" class="notice" role="status">{{ t('status.empty') }}</p>
       <div v-else class="report__panels">
         <DailyRevenueChart :points="daily" :currency="currency" :theme="theme" />
+        <CategoryTable :rows="categories" :totals="kpis" :currency="currency" />
       </div>
     </div>
   </section>
@@ -240,6 +243,13 @@ function onPaymentMethodChange(next: PaymentFilter) {
 .report__panels {
   display: grid;
   gap: 16px;
+}
+
+@container (min-width: 1100px) {
+  .report__panels {
+    grid-template-columns: minmax(0, 3fr) minmax(0, 2fr);
+    align-items: start;
+  }
 }
 
 .panel {
