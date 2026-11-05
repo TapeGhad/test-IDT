@@ -15,6 +15,8 @@ export type PaymentFilter = PaymentMethod | 'all'
 export const LOCALES = ['en', 'es', 'fr'] as const
 export type Locale = (typeof LOCALES)[number]
 
+export type Theme = 'light' | 'dark'
+
 export interface Transaction {
   id: string
   /** ISO 8601, UTC */
@@ -38,4 +40,26 @@ export interface SalesResponse {
 export interface DateRange {
   from: string
   to: string
+}
+
+/** `detail` payloads of the DOM events the widget dispatches. */
+export interface LoadedDetail extends DateRange {
+  storeId: string
+  currency: string
+  transactionCount: number
+}
+
+export interface LoadErrorDetail extends DateRange {
+  storeId: string
+  message: string
+}
+
+export interface FiltersChangeDetail extends DateRange {
+  paymentMethod: PaymentFilter
+}
+
+export interface StoreSalesReportEventMap {
+  loaded: CustomEvent<LoadedDetail>
+  'load-error': CustomEvent<LoadErrorDetail>
+  'filters-change': CustomEvent<FiltersChangeDetail>
 }
