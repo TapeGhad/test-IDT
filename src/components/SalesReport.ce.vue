@@ -2,7 +2,7 @@
 import { computed, ref, toRef, useHost, watch } from 'vue'
 import { LOCALE_NAMES, normalizeLocale, provideI18n } from '@/i18n'
 import { useSalesReport } from '@/composables/useSalesReport'
-import { computeKpis, filterByPayment } from '@/report/aggregate'
+import { computeKpis, dailyRevenue, filterByPayment } from '@/report/aggregate'
 import { defaultRange, isValidRange } from '@/report/dates'
 import {
   LOCALES,
@@ -12,6 +12,7 @@ import {
   type StoreSalesReportEventMap,
   type Theme,
 } from '@/types'
+import DailyRevenueChart from './DailyRevenueChart.ce.vue'
 import FiltersBar from './FiltersBar.ce.vue'
 import KpiCards from './KpiCards.ce.vue'
 
@@ -73,6 +74,9 @@ const transactions = computed(() =>
   filterByPayment(result.value?.sales.transactions ?? [], paymentMethod.value),
 )
 const kpis = computed(() => computeKpis(transactions.value))
+const daily = computed(() =>
+  result.value ? dailyRevenue(transactions.value, result.value.range) : [],
+)
 
 function onRangeChange(next: DateRange) {
   range.value = next
@@ -131,6 +135,9 @@ function onPaymentMethodChange(next: PaymentFilter) {
       </p>
       <KpiCards :kpis="kpis" :currency="currency" />
       <p v-if="transactions.length === 0" class="notice" role="status">{{ t('status.empty') }}</p>
+      <div v-else class="report__panels">
+        <DailyRevenueChart :points="daily" :currency="currency" :theme="theme" />
+      </div>
     </div>
   </section>
 </template>
@@ -228,6 +235,24 @@ function onPaymentMethodChange(next: PaymentFilter) {
 
 .report__content.is-stale {
   opacity: 0.55;
+}
+
+.report__panels {
+  display: grid;
+  gap: 16px;
+}
+
+.panel {
+  min-width: 0;
+  padding: 16px;
+  border: 1px solid var(--ssr-border);
+  border-radius: 10px;
+}
+
+.panel__title {
+  margin: 0 0 12px;
+  font-size: 15px;
+  font-weight: 600;
 }
 
 .field {
