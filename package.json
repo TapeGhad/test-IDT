@@ -1,12 +1,24 @@
 {
   "name": "store-sales-report",
-  "version": "0.0.0",
+  "version": "0.1.0",
+  "description": "Embeddable Store Sales Report widget: Vue 3 component and Web Component",
   "private": true,
   "type": "module",
+  "files": [
+    "dist"
+  ],
+  "exports": {
+    ".": {
+      "types": "./dist/lib/index.d.ts",
+      "import": "./dist/lib/index.js"
+    },
+    "./element": "./dist/wc/store-sales-report.js"
+  },
   "scripts": {
     "dev": "vite",
-    "build": "run-p type-check \"build-only {@}\" --",
-    "build-only": "vite build",
+    "build": "run-p type-check build:wc build:lib",
+    "build:wc": "vite build",
+    "build:lib": "vite build --config vite.lib.config.ts",
     "test": "vitest run",
     "test:watch": "vitest",
     "type-check": "vue-tsc --build",
@@ -15,9 +27,11 @@
     "lint:eslint": "eslint . --fix --cache",
     "format": "prettier --write --experimental-cli src/ playground/"
   },
+  "peerDependencies": {
+    "vue": "^3.5.0"
+  },
   "dependencies": {
-    "chart.js": "^4.6.1",
-    "vue": "^3.5.42"
+    "chart.js": "^4.6.1"
   },
   "devDependencies": {
     "@tsconfig/node24": "^24.0.5",
@@ -39,7 +53,9 @@
     "prettier": "3.9.6",
     "typescript": "~6.0.0",
     "vite": "^8.2.2",
+    "vite-plugin-dts": "^5.1.2",
     "vitest": "^4.1.11",
+    "vue": "^3.5.42",
     "vue-eslint-parser": "^10.4.1",
     "vue-tsc": "^3.3.11"
   },
